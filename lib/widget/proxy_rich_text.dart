@@ -20,7 +20,6 @@ class ProxyRichText extends StatelessWidget {
       return richTextBuilder!.call(textSpan);
     }
 
-
-    return Text.rich(TextSpan(children: [textSpan, TextSpan(text: '\u2028')]));
+    return Text.rich(TextSpan(children: [textSpan, TextSpan(text: '\r')]));
   }
 }
