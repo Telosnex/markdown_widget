@@ -20,6 +20,10 @@ class ProxyRichText extends StatelessWidget {
       return richTextBuilder!.call(textSpan);
     }
 
-    return Text.rich(TextSpan(children: [textSpan, TextSpan(text: '\r')]));
+    if (kIsWeb) {
+      return Text.rich(textSpan);
+    } else {
+      return Text.rich(TextSpan(children: [textSpan, TextSpan(text: '\r')]));
+    }
   }
 }
