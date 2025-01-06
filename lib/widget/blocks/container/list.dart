@@ -82,6 +82,7 @@ class ListNode extends ElementNode {
       children: [
         TextSpan(text: markerText, style: parentStyle),
         if (children.isNotEmpty) children.first.build(),
+        const TextSpan(text: '\n'), 
         for (final child in children.skip(1)) ...[
           if (child is UlOrOLNode) const TextSpan(text: '\n'),
           child.build(),
