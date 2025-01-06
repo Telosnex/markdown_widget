@@ -33,8 +33,13 @@ class UlOrOLNode extends ElementNode {
 
   @override
   InlineSpan build() {
+    final needsLeadingNewline = parent != null && parent is! UlOrOLNode;
+
     return TextSpan(
-      children: children.map((child) => child.build()).toList(),
+      children: [
+        if (needsLeadingNewline) const TextSpan(text: '\n'),
+        ...children.map((child) => child.build()).toList(),
+      ],
     );
   }
 
