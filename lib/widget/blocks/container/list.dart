@@ -33,21 +33,8 @@ class UlOrOLNode extends ElementNode {
 
   @override
   InlineSpan build() {
-    return WidgetSpan(
-      child: Padding(
-        padding: EdgeInsets.only(top: parent == null ? 0 : config.marginBottom),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate(
-            children.length,
-            (index) {
-              final childNode = children[index];
-              return ProxyRichText(childNode.build(),
-                  richTextBuilder: visitor.richTextBuilder);
-            },
-          ),
-        ),
-      ),
+    return TextSpan(
+      children: children.map((child) => child.build()).toList(),
     );
   }
 
@@ -86,52 +73,20 @@ class ListNode extends ElementNode {
 
   @override
   InlineSpan build() {
-    final space = config.li.marginLeft;
-    final marginBottom = config.li.marginBottom;
-    final parentStyleHeight =
-        (parentStyle?.fontSize ?? config.p.textStyle.fontSize ?? 16.0) *
-            (parentStyle?.height ?? config.p.textStyle.height ?? 1.2);
-    Widget marker;
-    if (isCheckbox) {
-      marker = ProxyRichText(
-        children.removeAt(0).build(),
-        richTextBuilder: visitor.richTextBuilder,
-      );
-    } else {
-      marker = config.li.marker?.call(isOrdered, depth, index) ??
-          getDefaultMarker(isOrdered, depth, parentStyle?.color, index,
-              parentStyleHeight / 2, config);
-    }
-    return WidgetSpan(
-      child: Padding(
-        padding: EdgeInsets.only(bottom: marginBottom),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: space,
-              child: marker,
-            ),
-            Flexible(
-              child: ProxyRichText(
-                TextSpan(
-                  children: [
-                    if (children.isNotEmpty) children.first.build(),
-                    for (final child in children.skip(1)) ...[
-                      // Introducing a new line before the next list item.
-                      // Otherwise, it might be rendered on the same line, disrupting the layout.
-                      if (child is UlOrOLNode) const TextSpan(text: '\n'),
-                      child.build(),
-                    ],
-                  ],
-                ),
-                richTextBuilder: visitor.richTextBuilder,
-              ),
-            ),
-          ],
-        ),
-      ),
+    // Create the marker text with proper indentation
+    final indent = '  ' * depth;
+    final marker = isOrdered ? '${index + 1}. ' : '• ';
+    final markerText = indent + marker;
+
+    return TextSpan(
+      children: [
+        TextSpan(text: markerText, style: parentStyle),
+        if (children.isNotEmpty) children.first.build(),
+        for (final child in children.skip(1)) ...[
+          if (child is UlOrOLNode) const TextSpan(text: '\n'),
+          child.build(),
+        ],
+      ],
     );
   }
 
