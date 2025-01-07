@@ -116,7 +116,7 @@ class ListNode extends ElementNode {
           if (_kDebug) const TextSpan(text: '<LC1>'),
           children.first.build(),
           if (_kDebug) const TextSpan(text: '</LC1>'),
-          if (!isLastInParent) const TextSpan(text: '\n'),
+          if (!isLastInParent || (depth > 0)) const TextSpan(text: '\n'),
         ],
         for (final child in children.skip(1)) ...[
           if (_kDebug) const TextSpan(text: '<LC2>'),

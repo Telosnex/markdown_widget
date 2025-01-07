@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../config/configs.dart';
-import '../../proxy_rich_text.dart';
 import '../../span_node.dart';
 import '../../widget_visitor.dart';
 
@@ -17,24 +16,25 @@ class HeadingNode extends ElementNode {
 
   @override
   InlineSpan build() {
-    final divider = headingConfig.divider;
-    if (divider == null) return childrenSpan;
-    return WidgetSpan(
-      child: Padding(
-        padding: headingConfig.padding,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            ProxyRichText(
-              childrenSpan,
-              richTextBuilder: visitor.richTextBuilder,
-            ),
-            _Divider(divider: divider.copy(color: parentStyle?.color)),
-          ],
-        ),
-      ),
-    );
+    return TextSpan(children: [
+      // WidgetSpan(
+      // child: Padding(
+      //   padding: headingConfig.padding,
+      //   child: Column(
+      //     mainAxisAlignment: MainAxisAlignment.start,
+      //     crossAxisAlignment: CrossAxisAlignment.start,
+      //     children: <Widget>[
+      //       ProxyRichText(
+      //         childrenSpan,
+      //         richTextBuilder: visitor.richTextBuilder,
+      //         ),
+      //     ],
+      //   ),
+      // ),
+      // ),
+      childrenSpan,
+      TextSpan(text: '\n ', style: TextStyle(fontSize: 0.00001, height: 0.00001)),
+    ]);
   }
 
   HeadingNode copy({HeadingConfig? headingConfig}) {
@@ -50,6 +50,7 @@ class HeadingNode extends ElementNode {
 }
 
 ///divider widget
+// ignore: unused_element
 class _Divider extends StatelessWidget {
   final HeadingDivider divider;
 
