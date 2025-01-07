@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 
 import '../../../config/configs.dart';
 import '../../inlines/input.dart';
-import '../../proxy_rich_text.dart';
 import '../../span_node.dart';
 import '../../widget_visitor.dart';
 import '../leaf/paragraph.dart';
+
+const _kDebug = false;
 
 ///Tag [MarkdownTag.ol]、[MarkdownTag.ul]
 ///
@@ -33,12 +34,21 @@ class UlOrOLNode extends ElementNode {
 
   @override
   InlineSpan build() {
-    final needsLeadingNewline = parent != null && parent is! UlOrOLNode;
-
     return TextSpan(
       children: [
-        if (needsLeadingNewline) const TextSpan(text: '\n'),
-        ...children.map((child) => child.build()).toList(),
+        // if (needsLeadingNewline) const TextSpan(text: '\n'),
+        if (_kDebug) const TextSpan(text: '<N>'),
+        if (children.isNotEmpty) ...[
+          if (_kDebug) const TextSpan(text: '<NCA>'),
+          children.first.build(),
+          if (_kDebug) const TextSpan(text: '</NCA>'),
+        ],
+        for (final child in children.skip(1)) ...[
+          if (_kDebug) const TextSpan(text: '<NCB>'),
+          child.build(),
+          if (_kDebug) const TextSpan(text: '</NCB>'),
+        ],
+        if (_kDebug) const TextSpan(text: '</N>'),
       ],
     );
   }
@@ -78,20 +88,42 @@ class ListNode extends ElementNode {
 
   @override
   InlineSpan build() {
-    // Create the marker text with proper indentation
-    final indent = '  ' * depth;
-    final marker = isOrdered ? '${index + 1}. ' : '• ';
-    final markerText = indent + marker;
-
+    final markerStringFallback = isOrdered ? '${index + 1}. ' : '• ';
+    // Add remaining children with line breaks
+    final isFirstInParent =
+        parent is UlOrOLNode && (parent as UlOrOLNode).children.first == this;
+    final isLastInParent =
+        parent is UlOrOLNode && (parent as UlOrOLNode).children.last == this;
     return TextSpan(
       children: [
-        TextSpan(text: markerText, style: parentStyle),
-        if (children.isNotEmpty) children.first.build(),
-        const TextSpan(text: '\n'), 
-        for (final child in children.skip(1)) ...[
-          if (child is UlOrOLNode) const TextSpan(text: '\n'),
-          child.build(),
+        if (isFirstInParent)
+          TextSpan(
+            text: '\n',
+            style: TextStyle(height: 0, fontSize: 0),
+          ),
+        if (_kDebug) const TextSpan(text: '<L>'),
+        if (children.isNotEmpty) ...[
+          if (depth > 0)
+            TextSpan(
+              children: [TextSpan(text: '  ' * depth)],
+            ),
+          TextSpan(text: markerStringFallback),
+          // WidgetSpan(
+          //     child: Padding(
+          //   padding: EdgeInsets.only(left: buffer),
+          //   child: Text.rich(TextSpan(text: markerStringFallback)),
+          // )),
+          if (_kDebug) const TextSpan(text: '<LC1>'),
+          children.first.build(),
+          if (_kDebug) const TextSpan(text: '</LC1>'),
+          if (!isLastInParent) const TextSpan(text: '\n'),
         ],
+        for (final child in children.skip(1)) ...[
+          if (_kDebug) const TextSpan(text: '<LC2>'),
+          child.build(),
+          if (_kDebug) const TextSpan(text: '</LC2>'),
+        ],
+        if (_kDebug) const TextSpan(text: '</L>'),
       ],
     );
   }
