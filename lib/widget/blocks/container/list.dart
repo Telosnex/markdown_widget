@@ -88,15 +88,10 @@ class ListNode extends ElementNode {
 
   @override
   InlineSpan build() {
-    final markerStringFallback = isOrdered ? '${index + 1}. ' : '• ';
+    final markerStringFallback = isOrdered ? '${index + 1}.  ' : '•  ';
     // Add remaining children with line breaks
-    final isFirstInParent =
-        parent is UlOrOLNode && (parent as UlOrOLNode).children.first == this;
-    final isLastInParent =
-        parent is UlOrOLNode && (parent as UlOrOLNode).children.last == this;
     return TextSpan(
       children: [
-        if (isFirstInParent)
           TextSpan(
             text: '\n',
             style: TextStyle(height: 0, fontSize: 0),
@@ -116,7 +111,6 @@ class ListNode extends ElementNode {
           if (_kDebug) const TextSpan(text: '<LC1>'),
           children.first.build(),
           if (_kDebug) const TextSpan(text: '</LC1>'),
-          if (!isLastInParent || (depth > 0)) const TextSpan(text: '\n'),
         ],
         for (final child in children.skip(1)) ...[
           if (_kDebug) const TextSpan(text: '<LC2>'),
