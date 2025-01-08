@@ -48,6 +48,15 @@ class CodeBlockNode extends ElementNode {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(splitContents.length, (index) {
             final currentContent = splitContents[index];
+            // Ensure blank lines in the code block are rendered.
+            if (currentContent.trim().isEmpty) {
+              return ProxyRichText(
+                TextSpan(
+                  text: ' ',
+                ),
+                richTextBuilder: visitor.richTextBuilder,
+              );
+            }
             return ProxyRichText(
               TextSpan(
                 children: highLightSpans(
@@ -129,6 +138,7 @@ List<TextSpan> convertHiNodes(
   for (var node in nodes) {
     traverse(node, null);
   }
+  spans.add(TextSpan(text: '\n ', style: TextStyle(fontSize: 0, height: 0)));
   return spans;
 }
 
